@@ -50,7 +50,7 @@ class GoogleCollector:
         gs = authorize(cred)
 
         # Connect 
-        # UTM-·‡Á‡
+        # UTM-√°√†√ß√†
         if table_info:
             self.__ws = gs.open_by_key(table_info['key']).worksheet(table_info['title'])
         # BigQuery
@@ -111,5 +111,4 @@ class DWHCollector:
             :query: str = query for collect data
         return: DataFrame with result
         """
-        df = read_sql_query(query, self.__connection)
-        return df
+        return read_sql_query(query, self.__connection)
