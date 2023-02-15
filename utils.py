@@ -3,6 +3,34 @@ from pandas import read_csv
 from datetime import date, timedelta
 
 
+class TempEditor:
+    
+    def __init__(self, temp):
+        """
+        Assemble query
+
+        params:
+            :temp: str = query template 
+        """
+        self.temp = temp
+        
+    def get_temp(self):
+        return self.temp
+
+    def replace(self, repl: dict):
+        """
+        Assemble query for DWH
+
+        params:
+            :repl: dict = {pattern_to_replace: new_value}
+        return: str =  prepeared query
+        """
+        query = self.temp
+        for tag, val in repl.items():
+            query = query.replace(tag, val)
+        return query
+
+
 def open_file(path, mode="r", encoding="utf-8", text=None):
     with open(path, mode=mode, encoding=encoding) as file:
         if mode == "r":
@@ -11,7 +39,13 @@ def open_file(path, mode="r", encoding="utf-8", text=None):
             file.write(text)
 
 
-def create_dir(path):
+def create_dir(path: str) -> bool:
+    """Create dir
+    
+    params: 
+        path: str - path to dir
+    return: bool"""
+    
     try:
         mkdir(path)
         return True
@@ -34,11 +68,15 @@ def half_month():
     return date1, date2
 
 
-def load_manager(path: str, func):
-    root, name = path.split('/')[1:]
-    if name in listdir(root):
-        df = read_csv(path)
-    else:
-        df = func()
-        df.to_csv(path, index=False)
+def load_manager(path: str=None, func=None, low_memory=True, memory_map=False):
+    
+    if not path:
+        return func()
+    
+    parts = path.split('/')
+    if parts[-1] in listdir("/".join(parts[:-1])):
+        return read_csv(path, low_memory=low_memory, memory_map=memory_map)
+    
+    df = func()
+    df.to_csv(path, index=False)
     return df
