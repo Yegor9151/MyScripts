@@ -1,6 +1,7 @@
 from os import listdir, mkdir
 from pandas import read_csv
 from datetime import date, timedelta
+from requests import post
 
 
 class TempEditor:
@@ -80,3 +81,36 @@ def load_manager(path: str=None, func=None, low_memory=True, memory_map=False):
     df = func()
     df.to_csv(path, index=False)
     return df
+
+
+class TeleBot:
+
+    def __init__(self, token, chat_id):
+
+        self.__TOKEN = token
+        self.__CHAT_ID = chat_id
+
+    def send_documents(self, files_dir):
+        """push data in telegram iteratively
+        
+        Params:
+            :files_dir - direction with files to upload in telegram chat
+        Return: True if all is done"""
+
+        URL = f'https://api.telegram.org/bot{self.__TOKEN}/sendDocument?chat_id={self.__CHAT_ID}'
+
+        for file in listdir(files_dir):
+            if '.zip' in file:
+                path = f'{files_dir}/{file}'
+                file = {'document': open(path, 'rb')}
+                post(URL, files=file, verify=False)
+
+        return URL
+
+    def send_message(self, text):
+
+        URL = f'https://api.telegram.org/bot{self.__TOKEN}/sendMessage?chat_id={self.__CHAT_ID}&text={text}'
+
+        post(URL, verify=False)
+
+        return URL
