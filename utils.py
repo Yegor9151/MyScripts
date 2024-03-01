@@ -64,31 +64,25 @@ def half_month():
 
 
 def load_manager(path: str=None, func=None, low_memory=True, memory_map=False, parse_dates=False):
-    # Есть 3 сценария действий менеджера загрузки
-    
-    # 1. Если путь не обозначен, тогда, просто выполняем функцию
+
+    # 1. 
     if not path:
         return func()
     
-    # 2. Разбиваем путь на части
+    # 2. 
     parts = path.split('/')
-    # Есть файл уже есть в папке, тогда читаем его
     if parts[-1] in listdir("/".join(parts[:-1])):
         return read_csv(path, low_memory=low_memory, memory_map=memory_map, parse_dates=parse_dates)
     
-    # 3. Выполняем функцию
+    # 3.
     data = func()
-    # Пробуем сохранить данные,
     try:
-        # если они есть
         if data.shape[0]:
             data.to_csv(path, index=False)
-    # Если тип данных не верен,
     except TypeError as err:
-        # тогда просто сохраняем файл
         open_file(path, 'w', text=data)
         print(err)
-    # возвращаем собранные данные
+
     return data
 
 
@@ -139,10 +133,8 @@ def reduce_memory(df: DataFrame):
 
     for col in df.columns:
         
-        # Если это целыечисленные данные
         if "int" in str(df[col].dtype):
             
-            # если между данными нового и старого типа разницы нет, то меняем на новый
             if not (df[col] != df[col].astype(f"int8")).sum():
                 df[col] = df[col].astype(f"int8")
             elif not (df[col] != df[col].astype(f"int16")).sum():
@@ -152,10 +144,8 @@ def reduce_memory(df: DataFrame):
             elif not (df[col] != df[col].astype(f"int64")).sum():
                 df[col] = df[col].astype(f"int64")
         
-        # Если это вещественные данные
         elif "float" in str(df[col].dtype):
             
-            # если между данными нового и старого типа разницы нет, то меняем на новый
             if not (df[col] != df[col].astype(f"float16")).sum():
                 df[col] = df[col].astype(f"int16")
             elif not (df[col] != df[col].astype(f"float32")).sum():
@@ -254,5 +244,3 @@ class Email:
             del self.__msg
             
             return True
-        
-        return False
